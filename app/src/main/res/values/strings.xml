@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CataApp</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="routes">Routes</string>
+    <string name="busNumber">Bus #</string>
+    <string name="streetMapId">brandonbielicki.lkj8i14b</string>
+</resources>
