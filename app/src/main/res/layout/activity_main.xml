@@ -32,7 +32,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_toLeftOf="@+id/spacer"
-            android:layout_toStartOf="@+id/spacer" />
+            android:layout_toStartOf="@+id/spacer"
+            android:onClick="routeSelect" />
 
         <View
             android:id="@+id/spacer"

@@ -6,4 +6,5 @@
     <string name="routes">Routes</string>
     <string name="busNumber">Bus #</string>
     <string name="streetMapId">brandonbielicki.lkj8i14b</string>
+    <string name="title_activity_route_select">routeSelect</string>
 </resources>
