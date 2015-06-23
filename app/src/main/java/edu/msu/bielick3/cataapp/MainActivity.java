@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.views.MapViewListener;
 import com.mapbox.mapboxsdk.views.util.TilesLoadedListener;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -69,25 +70,7 @@ public class MainActivity extends Activity {
         });
         mv.setZoom(13);
 
-        Firebase.setAndroidContext(this);
-        Firebase ref = new Firebase("https://sizzling-fire-5776.firebaseio.com/routes");
 
-        Query query = ref.orderByChild("RouteNumber").equalTo("26");
-
-        query.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() != null) {
-                    Log.d("TEST", dataSnapshot.getValue().toString());
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-
-            }
-        });
 
     }
 
@@ -101,9 +84,38 @@ public class MainActivity extends Activity {
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 route = data.getStringExtra("route");
+                displayRoute(route);
             }
         }
-        Log.d("RESULT", route);
+    }
+
+    public void displayRoute(String route) {
+        Firebase.setAndroidContext(this);
+        Firebase ref = new Firebase("https://sizzling-fire-5776.firebaseio.com/routes");
+
+        Query query = ref.orderByChild("RouteNumber").equalTo(route);
+
+        query.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() != null) {
+                    ArrayList<String> routeStops = null;
+                    for(DataSnapshot route : dataSnapshot.getChildren()) {
+                        DataSnapshot stops = route.child("Stops");
+                        for(DataSnapshot oneStop : stops.getChildren()) {
+                            Log.d("TEST", oneStop.child("StopId").getValue().toString());
+                            routeStops.add(oneStop.child("StopId").getValue().toString());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
     }
 
     @Override
