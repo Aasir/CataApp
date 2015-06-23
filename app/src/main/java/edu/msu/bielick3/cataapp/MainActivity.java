@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
     private MapView mv;
     private UserLocationOverlay myLocationOverlay;
     private String currentMap = null;
-    private int route;
+    private String route;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,17 +93,17 @@ public class MainActivity extends Activity {
 
     public void routeSelect(View view) {
         Intent intent = new Intent(this, routeSelect.class);
-        startActivityForResult(intent, 200);
+        startActivityForResult(intent, 1);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == 200) {
+        if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                route = data.getIntExtra("route", 1);
+                route = data.getStringExtra("route");
             }
         }
+        Log.d("RESULT", route);
     }
 
     @Override

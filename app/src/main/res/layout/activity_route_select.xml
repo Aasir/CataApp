@@ -50,15 +50,28 @@
             android:onClick="returnRoute" />
     </RelativeLayout>
 
-    <GridLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
         android:layout_above="@+id/buttonsBar"
-        android:numColumns="4"
-        android:columnCount="4"
-        android:rowCount="8"
-        android:id="@+id/gridview"></GridLayout>
+        android:layout_centerInParent="true"
+        android:gravity="center_vertical|center_horizontal">
+
+        <GridView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/gridview"
+            android:layout_alignParentLeft="false"
+            android:layout_above="@+id/buttonsBar"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:listSelector="@color/grey"
+            android:stretchMode="columnWidth"
+            android:textAlignment="center"
+            android:numColumns="4"
+            android:choiceMode="singleChoice"
+            android:clickable="true" />
+    </RelativeLayout>
 
 </RelativeLayout>
