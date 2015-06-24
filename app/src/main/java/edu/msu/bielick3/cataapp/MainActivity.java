@@ -51,7 +51,6 @@ public class MainActivity extends Activity {
 
         mv = (MapView) findViewById(R.id.mapview);
         mv.setUserLocationEnabled(true);
-        //mv.setUserLocationTrackingMode(UserLocationOverlay.TrackingMode.FOLLOW_BEARING);
         mv.setCenter(new ILatLng() {
             @Override
             public double getLatitude() {
@@ -100,14 +99,36 @@ public class MainActivity extends Activity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue() != null) {
-                    ArrayList<String> routeStops = null;
+                    final ArrayList<String> buses = new ArrayList<String>();;
                     for(DataSnapshot route : dataSnapshot.getChildren()) {
-                        DataSnapshot stops = route.child("Stops");
-                        for(DataSnapshot oneStop : stops.getChildren()) {
-                            Log.d("TEST", oneStop.child("StopId").getValue().toString());
-                            routeStops.add(oneStop.child("StopId").getValue().toString());
-                        }
+                        DataSnapshot test = route.child("BusNumber");
+                        buses.add(test.getValue().toString());
                     }
+
+                    Firebase busRef = new Firebase("https://sizzling-fire-5776.firebaseio.com/vehicles");
+                    busRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<Marker> markerArray = new ArrayList<Marker>();
+                            for (String bus : buses) {
+                                String latitude = dataSnapshot.child(bus).child("Lat").getValue().toString();
+                                String longitude = dataSnapshot.child(bus).child("Long").getValue().toString();
+                                LatLng pos = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                                Marker m = new Marker("Bus", "Bus", pos);
+                                markerArray.add(m);
+                            }
+                            mv.clear();
+                            for(Marker m : markerArray) {
+                                mv.addMarker(m);
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+
+                        }
+                    });
                 }
             }
 
