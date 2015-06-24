@@ -17,6 +17,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
@@ -28,11 +29,32 @@ import java.util.ArrayList;
 
 public class routeSelect extends Activity {
     private String route;
+    private Button cancelButton;
+    private Button selectButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_select);
+
+        selectButton = (Button)findViewById(R.id.select);
+        selectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.putExtra("route", route);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+        cancelButton = (Button)findViewById(R.id.cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
 
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setNumColumns(4);
@@ -95,18 +117,4 @@ public class routeSelect extends Activity {
         }
 
     }
-
-    public void cancelSelect(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    public void returnRoute(View view) {
-        Intent intent = new Intent();
-        intent.putExtra("route", route);
-        setResult(RESULT_OK,intent);
-        finish();
-    }
-
-
 }

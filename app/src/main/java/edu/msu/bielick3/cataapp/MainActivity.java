@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
                                 String latitude = dataSnapshot.child(bus).child("Lat").getValue().toString();
                                 String longitude = dataSnapshot.child(bus).child("Long").getValue().toString();
                                 LatLng pos = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-                                Marker m = new Marker("Bus", "Bus", pos);
+                                Marker m = new Marker("", "", pos);
                                 m.setMarker(ContextCompat.getDrawable(getApplicationContext(), R.mipmap.bus_marker));
                                 markerArray.add(m);
                             }
@@ -152,27 +152,5 @@ public class MainActivity extends Activity {
                 startActivityForResult(intent, 1);
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
