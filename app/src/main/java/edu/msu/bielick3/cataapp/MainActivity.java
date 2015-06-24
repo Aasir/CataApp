@@ -2,6 +2,7 @@ package edu.msu.bielick3.cataapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.Button;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -35,22 +37,28 @@ import java.util.Map;
 
 public class MainActivity extends Activity {
 
-    private WebView mWebView;
-//    JavaScriptInterface JSInterface;
-
-    // MapBox
     private MapView mv;
-    private UserLocationOverlay myLocationOverlay;
-    private String currentMap = null;
     private String route;
+    private Button routesButton;
+    private Button button2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        routesButton = (Button) findViewById(R.id.routes);
+        routesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), routeSelect.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
         mv = (MapView) findViewById(R.id.mapview);
         mv.setUserLocationEnabled(true);
+        mv.setUserLocationTrackingMode(UserLocationOverlay.TrackingMode.NONE);
         mv.setCenter(new ILatLng() {
             @Override
             public double getLatitude() {
@@ -69,13 +77,6 @@ public class MainActivity extends Activity {
         });
         mv.setZoom(13);
 
-
-
-    }
-
-    public void routeSelect(View view) {
-        Intent intent = new Intent(this, routeSelect.class);
-        startActivityForResult(intent, 1);
     }
 
     @Override
@@ -89,12 +90,14 @@ public class MainActivity extends Activity {
     }
 
     public void displayRoute(String route) {
+
+        final String routeTemp = route;
         Firebase.setAndroidContext(this);
         Firebase ref = new Firebase("https://sizzling-fire-5776.firebaseio.com/routes");
 
-        Query query = ref.orderByChild("RouteNumber").equalTo(route);
+        final Query query = ref.orderByChild("RouteNumber").equalTo(route);
 
-        query.addValueEventListener(new ValueEventListener() {
+        final ValueEventListener vehicleListener = new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -115,6 +118,7 @@ public class MainActivity extends Activity {
                                 String longitude = dataSnapshot.child(bus).child("Long").getValue().toString();
                                 LatLng pos = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
                                 Marker m = new Marker("Bus", "Bus", pos);
+                                m.setMarker(ContextCompat.getDrawable(getApplicationContext(), R.mipmap.bus_marker));
                                 markerArray.add(m);
                             }
                             mv.clear();
@@ -134,7 +138,18 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
+                query.removeEventListener(this);
+            }
+        };
 
+        query.addValueEventListener(vehicleListener);
+
+        routesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                query.removeEventListener(vehicleListener);
+                Intent intent = new Intent(getApplicationContext(), routeSelect.class);
+                startActivityForResult(intent, 1);
             }
         });
     }
