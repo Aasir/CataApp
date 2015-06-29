@@ -2,6 +2,7 @@ package edu.msu.bielick3.cataapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -41,11 +43,25 @@ public class MainActivity extends Activity {
     private String route;
     private Button routesButton;
     private Button button2;
+    private TextView timerText;
+    private long timerStart;
+    private Handler handler = new Handler();
+    private Runnable timer = new Runnable() {
+        @Override
+        public void run() {
+      /* do what you need to do */
+            timerText.setText("Last Update: "+((System.currentTimeMillis()-timerStart)/1000));
+      /* and here comes the "trick" */
+            handler.postDelayed(this, 1000);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        timerText = (TextView)findViewById(R.id.timerText);
 
         routesButton = (Button) findViewById(R.id.routes);
         routesButton.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +105,10 @@ public class MainActivity extends Activity {
         }
     }
 
+    private ArrayList<Marker> prevBus = new ArrayList<Marker>();
     public void displayRoute(String route) {
+
+
 
         final String routeTemp = route;
         Firebase.setAndroidContext(this);
@@ -104,27 +123,34 @@ public class MainActivity extends Activity {
                 if(dataSnapshot.getValue() != null) {
                     final ArrayList<String> buses = new ArrayList<String>();;
                     for(DataSnapshot route : dataSnapshot.getChildren()) {
-                        DataSnapshot test = route.child("BusNumber");
-                        buses.add(test.getValue().toString());
+                        DataSnapshot busNumber = route.child("BusNumber");
+                        buses.add(busNumber.getValue().toString());
                     }
 
                     Firebase busRef = new Firebase("https://sizzling-fire-5776.firebaseio.com/vehicles");
                     busRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            ArrayList<Marker> markerArray = new ArrayList<Marker>();
+                            ArrayList<Marker> busMarkerArray = new ArrayList<Marker>();
                             for (String bus : buses) {
                                 String latitude = dataSnapshot.child(bus).child("Lat").getValue().toString();
                                 String longitude = dataSnapshot.child(bus).child("Long").getValue().toString();
                                 LatLng pos = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
                                 Marker m = new Marker("", "", pos);
                                 m.setMarker(ContextCompat.getDrawable(getApplicationContext(), R.mipmap.bus_marker));
-                                markerArray.add(m);
+                                busMarkerArray.add(m);
                             }
-                            mv.clear();
-                            for(Marker m : markerArray) {
+                            for (Marker m : prevBus) {
+                                mv.removeMarker(m);
+                            }
+                            prevBus.clear();
+                            for (Marker m : busMarkerArray) {
                                 mv.addMarker(m);
                             }
+                            timerStart = System.currentTimeMillis();
+                            handler.postDelayed(timer, 1000);
+                            mv.invalidate();
+                            prevBus = busMarkerArray;
 
                         }
 
@@ -138,7 +164,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                query.removeEventListener(this);
+
             }
         };
 
